@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bulldozer Algebra: Ooze Defense</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #e0f7fa;
+      text-align: center;
+      padding: 20px;
+    }
+    #gameArea {
+      position: relative;
+      width: 600px;
+      height: 200px;
+      margin: 0 auto;
+      border: 2px solid #00796b;
+      background-color: #ffffff;
+      overflow: hidden;
+    }
+    #bulldozer {
+      position: absolute;
+      left: 10px;
+      top: 80px;
+      font-size: 2em;
+      transition: left 0.5s ease;
+    }
+    .dirt {
+      position: absolute;
+      top: 100px;
+      width: 40px;
+      height: 40px;
+      background-color: #8d6e63;
+      border: 2px solid #5d4037;
+    }
+    #ooze {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 0;
+      height: 100%;
+      background-color: #66bb6a;
+      z-index: -1;
+      transition: width 0.5s ease;
+    }
+    #problemArea {
+      margin-top: 20px;
+    }
+    input {
+      padding: 8px;
+      font-size: 1em;
+    }
+    button {
+      padding: 8px 16px;
+      font-size: 1em;
+      background-color: #00796b;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #status {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    #timer {
+      font-size: 1.2em;
+      color: #d32f2f;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🚜 Bulldozer Algebra: Ooze Defense</h1>
+  <div id="gameArea">
+    <div id="bulldozer">🚜</div>
+    <div id="ooze"></div>
+  </div>
+  <div id="problemArea">
+    <p id="problemText">Solve: </p>
+    <input type="text" id="answerInput" placeholder="Your answer">
+    <button onclick="submitAnswer()">Submit</button>
+    <div id="timer">⏱️ Time left: 10s</div>
+    <div id="status"></div>
+  </div>
+
+  <!-- Sound effects -->
+  <audio id="correctSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+  <audio id="wrongSound" src="https://actions.google.com/sounds/v1/cartoon/boing.ogg"></audio>
+  <audio id="gameOverSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+
+  <script>
+    const bulldozer = document.getElementById('bulldozer');
+    const gameArea = document.getElementById('gameArea');
+    const ooze = document.getElementById('ooze');
+    const problemText = document.getElementById('problemText');
+    const answerInput = document.getElementById('answerInput');
+    const status = document.getElementById('status');
+    const timerDisplay = document.getElementById('timer');
+
+    const correctSound = document.getElementById('correctSound');
+    const wrongSound = document.getElementById('wrongSound');
+    const gameOverSound = document.getElementById('gameOverSound');
+
+    let bulldozerX = 10;
+    let oozeWidth = 0;
+    let currentAnswer = 0;
+    let dirtCount = 0;
+    let oozeSpeed = 1;
+    let timeLeft = 10;
+    let timer;
+
+    function generateProblem() {
+      const a = Math.floor(Math.random() * 5) + 1;
+      const b = Math.floor(Math.random() * 10) + 1;
+      currentAnswer = (b / a).toFixed(2);
+      problemText.innerText = `Solve: ${a}x = ${b}`;
+      answerInput.value = '';
+      status.innerText = '';
+      timeLeft = 10;
+      timerDisplay.innerText = `⏱️ Time left: ${timeLeft}s`;
+      clearInterval(timer);
+      timer = setInterval(countdown, 1000);
+    }
+
+    function countdown() {
+      timeLeft--;
+      timerDisplay.innerText = `⏱️ Time left: ${timeLeft}s`;
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        status.innerText = "⏰ Time's up! Ooze advances.";
+        wrongSound.play();
+        advanceOoze();
+        generateProblem();
+      }
+    }
+
+    function submitAnswer() {
+      const userAnswer = parseFloat(answerInput.value).toFixed(2);
+      if (userAnswer === currentAnswer) {
+        correctSound.play();
+        status.innerText = "✅ Correct!";
+        clearInterval(timer);
+        pushDirt();
+        generateProblem();
+      } else {
+        wrongSound.play();
+        status.innerText = "❌ Incorrect! Ooze advances.";
+        clearInterval(timer);
+        advanceOoze();
+        generateProblem();
+      }
+    }
+
+    function pushDirt() {
+      bulldozerX += 40;
+      bulldozer.style.left = bulldozerX + 'px';
+
+      const dirt = document.createElement('div');
+      dirt.className = 'dirt';
+      dirt.style.left = bulldozerX + 'px';
+      gameArea.appendChild(dirt);
+
+      dirtCount++;
+      if (dirtCount % 3 === 0) {
+        oozeSpeed += 1;
+      }
+    }
+
+    function advanceOoze() {
+      oozeWidth += oozeSpeed * 10;
+      ooze.style.width = oozeWidth + 'px';
+
+      if (oozeWidth >= 600) {
+        gameOverSound.play();
+        status.innerText = "💀 The ooze has flooded the zone!";
+        answerInput.disabled = true;
+      }
+    }
+
+    generateProblem();
+  </script>
+</body>
+</html>

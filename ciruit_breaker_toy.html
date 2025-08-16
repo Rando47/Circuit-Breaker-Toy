@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Circuit Breaker: Perseverance Toy</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1e1e2f;
+      color: #f0f0f0;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #00ffcc;
+    }
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      grid-gap: 5px;
+      justify-content: center;
+      margin: 20px auto;
+    }
+    .cell {
+      width: 60px;
+      height: 60px;
+      background: #333;
+      border: 2px solid #555;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .active {
+      background: #00ffcc;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 1.1em;
+    }
+    #reflection {
+      margin-top: 20px;
+      display: none;
+    }
+    textarea {
+      width: 80%;
+      height: 80px;
+      margin-top: 10px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background: #00ffcc;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔌 Circuit Breaker</h1>
+  <p>Activate all cells to complete the circuit. But beware—the board glitches!</p>
+  <div id="grid"></div>
+  <div id="message"></div>
+  <div id="reflection">
+    <p>💬 What strategy did you try? What will you do differently?</p>
+    <textarea id="reflectionInput" placeholder="Write your perseverance log here..."></textarea><br>
+    <button onclick="submitReflection()">Submit Reflection</button>
+  </div>
+
+  <script>
+    const gridSize = 5;
+    const glitchFrequency = 5;
+    let moveCount = 0;
+    let cells = [];
+
+    const grid = document.getElementById('grid');
+    const message = document.getElementById('message');
+    const reflection = document.getElementById('reflection');
+
+    function createGrid() {
+      for (let i = 0; i < gridSize * gridSize; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.dataset.index = i;
+        cell.onclick = () => toggleCell(i);
+        grid.appendChild(cell);
+        cells.push(cell);
+      }
+    }
+
+    function toggleCell(index) {
+      cells[index].classList.toggle('active');
+      moveCount++;
+      checkCompletion();
+      if (moveCount % glitchFrequency === 0) {
+        glitchBoard();
+      }
+    }
+
+    function glitchBoard() {
+      message.textContent = "⚡ Glitch! The board shifted...";
+      for (let i = 0; i < cells.length; i++) {
+        if (Math.random() < 0.2) {
+          cells[i].classList.toggle('active');
+        }
+      }
+    }
+
+    function checkCompletion() {
+      const allActive = cells.every(cell => cell.classList.contains('active'));
+      if (allActive) {
+        message.textContent = "✅ Circuit complete! You persevered!";
+        reflection.style.display = 'block';
+      }
+    }
+
+    function submitReflection() {
+      const log = document.getElementById('reflectionInput').value;
+      if (log.trim() === "") {
+        alert("Please write something before submitting.");
+        return;
+      }
+      message.textContent = "📝 Reflection saved. Your perseverance is part of our legacy.";
+      reflection.style.display = 'none';
+    }
+
+    createGrid();
+  </script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Circuit Breaker: Mission Mode</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f4f8;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(5, 80px);
+      grid-gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .cell {
+      background-color: #dbeafe;
+      border: 2px solid #3b82f6;
+      padding: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 8px;
+    }
+    .cell.clicked {
+      background-color: #93c5fd;
+      cursor: default;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 1.1em;
+      color: #555;
+    }
+    #resetBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: none;
+    }
+    #reflection {
+      margin-top: 20px;
+      display: none;
+    }
+    textarea {
+      width: 80%;
+      height: 100px;
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 1em;
+    }
+    footer {
+      margin-top: 40px;
+      font-size: 0.9em;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔌 Circuit Breaker: Mission Mode</h1>
+  <p>Mission: Find the 3 hidden perseverance quotes to trigger a reset.</p>
+  <div id="grid"></div>
+  <div id="message"></div>
+  <button id="resetBtn" onclick="showReflection()">Reset</button>
+  <div id="reflection">
+    <p>Which quote resonated most, and why?</p>
+    <textarea placeholder="Write your reflection here..."></textarea>
+  </div>
+  <footer>Built by F315 to honor perseverance and play.</footer>
+
+  <script>
+    const grid = document.getElementById('grid');
+    const message = document.getElementById('message');
+    const resetBtn = document.getElementById('resetBtn');
+    const reflection = document.getElementById('reflection');
+
+    const glitchMessages = [
+      "404: Motivation not found.",
+      "Syntax error in brain. Please reboot.",
+      "You pressed the wrong button. Again.",
+      "Wi-Fi connected. But to your neighbor’s printer.",
+      "Your code compiled. Into chaos.",
+      "Battery low. Confidence lower.",
+      "You’ve entered the procrastination zone.",
+      "Robot arm jammed. Try duct tape.",
+      "You blinked. The simulation reset.",
+      "Keyboard not responding. Try yelling louder.",
+      "You’re stuck in a loop. Like Monday mornings.",
+      "Teamwork error: Everyone’s waiting on you.",
+      "You forgot to save. Again.",
+      "The glitch is inside the glitch.",
+      "Achievement unlocked: Mild frustration."
+    ];
+
+    const quotes = [
+      "“Fall seven times, stand up eight.” – Japanese Proverb",
+      "“Perseverance is failing 19 times and succeeding the 20th.” – Julie Andrews",
+      "“Success is not final, failure is not fatal: It is the courage to continue that counts.” – Winston Churchill"
+    ];
+
+    let quoteIndices = [];
+    let foundQuotes = 0;
+
+    function createGrid() {
+      const totalCells = 25;
+      while (quoteIndices.length < 3) {
+        let rand = Math.floor(Math.random() * totalCells);
+        if (!quoteIndices.includes(rand)) quoteIndices.push(rand);
+      }
+
+      for (let i = 0; i < totalCells; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.innerText = '?';
+        cell.onclick = () => handleClick(cell, i);
+        grid.appendChild(cell);
+      }
+    }
+
+    function handleClick(cell, index) {
+      if (cell.classList.contains('clicked')) return;
+      cell.classList.add('clicked');
+
+      if (quoteIndices.includes(index)) {
+        const quote = quotes[quoteIndices.indexOf(index)];
+        message.innerText = quote;
+        foundQuotes++;
+        if (foundQuotes === 3) {
+          resetBtn.style.display = 'inline-block';
+          message.innerText = "✅ Mission complete! Click reset to reflect.";
+        }
+      } else {
+        const glitch = glitchMessages[Math.floor(Math.random() * glitchMessages.length)];
+        message.innerText = glitch;
+      }
+    }
+
+    function showReflection() {
+      resetBtn.style.display = 'none';
+      reflection.style.display = 'block';
+      message.innerText = "🧠 Reflect on what perseverance means to you.";
+    }
+
+    createGrid();
+  </script>
+</body>
+</html>
